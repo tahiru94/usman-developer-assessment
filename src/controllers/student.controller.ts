@@ -11,7 +11,7 @@ class StudentController {
         const idFromUrl: any = ctx.url.match(/\d+/);
         const studentId: number = parseInt(idFromUrl[0]);
         const selectedStudent = await studentRepo.getLogsByStudent(studentId);
-        console.log(selectedStudent);
+        ctx.body = selectedStudent;
     }
 
 }
