@@ -20,7 +20,9 @@
   },
   "homepage": "https://github.com/Triad-Behavioral-Health/developer-assessment-template#readme",
   "dependencies": {
+    "@types/koa-json": "^2.0.18",
     "koa": "^2.13.0",
+    "koa-json": "^2.0.2",
     "koa-router": "^9.1.0"
   },
   "devDependencies": {
