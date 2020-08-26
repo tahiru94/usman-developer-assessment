@@ -3,7 +3,6 @@ import * as koa from 'koa';
 import * as Router from 'koa-router';
 import * as moment from 'moment';
 import { studentRepo } from '../repos/student.repo';
-import { Assessment } from '../models';
 
 class StudentController {
     // constructor(){}
@@ -30,7 +29,7 @@ class StudentController {
         }).sort((first, second) => {
             return moment(first.open_time).diff(second.open_time);
         });
-        
+
         ctx.body = upcomingAssessments;
     }
 
