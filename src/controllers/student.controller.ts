@@ -21,7 +21,6 @@ class StudentController {
         const studentId = getStudentId(ctx.url);
         const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
 
-
         if (selectedStudent.error) {
             ctx.body = getInvalidStudentIdMessage(studentId);
         } else {
@@ -64,7 +63,7 @@ class StudentController {
 
             ctx.body = openAssessments.length ?
                 openAssessments :
-                `No open assessments exist for student ${selectedStudent.name}.`;
+                `No open assessments exist for ${selectedStudent.name}.`;
         }
     }
 
