@@ -8,3 +8,7 @@ export const getStudentId = (url: string): number => {
 
     return -1;
 }
+
+export const getInvalidStudentIdMessage = (id: number): string => {
+    return `No student was found for ID ${id}. Please try again.`;
+}
