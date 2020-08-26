@@ -57,7 +57,7 @@ const student1 = {
             id: 3,
             name: "Exam-2",
             description: "NCE-2020:Exam-2",
-            open_time: "2020-06-05T00:00:00.000Z",
+            open_time: new Date().toISOString(),
             close_time: "2029-06-05T00:00:00.000Z",
             time_limit: "100",
             version_number: 0,

@@ -40,16 +40,14 @@ class StudentController {
         const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
         const selectedLogs: any = await logRepo.getLogsByStudent(studentId);
 
-        console.log(selectedLogs);
-
         const studentAssessments: any[] = selectedStudent.assessments;
 
         const currentDate = new Date().toISOString();
 
         // First, find IDs for open assessment(s)
         const openAssessmentIds: any[] = selectedLogs.filter((log: any) => {
-            return log.start_time === moment(currentDate);
-        }).map((assessment: any) => assessment.id);
+            return moment(log.start_time).isSame(moment(currentDate), 'day');
+        }).map((assessment: any) => assessment.assessment);
 
         // Next, get the assessments based on log IDs
         const openAssessments = studentAssessments.filter(assessment => {
