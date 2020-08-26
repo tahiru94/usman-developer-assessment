@@ -50,7 +50,7 @@ const log1 = [
     {
         id: 15,
         is_complete: false,
-        start_time: "2020-08-06T15:42:57.000Z", // Mark this with todays data and time for an examle of an open exam
+        start_time: new Date().toISOString(), // Mark this with todays data and time for an examle of an open exam
         total_time: null,
         total_correct: null,
         build_seed: null,
@@ -78,6 +78,21 @@ const log2 = [
         student: 1,
         created_at: "2020-07-24T16:36:37.000Z",
         updated_at: "2020-07-24T16:39:41.000Z",
+        created_by: null,
+        updated_by: null
+    },
+    {
+        id: 32,
+        is_complete: false,
+        start_time: new Date().toISOString(), // Mark this with todays data and time for an examle of an open exam
+        total_time: null,
+        total_correct: null,
+        build_seed: null,
+        version_number: null,
+        assessment: 3,
+        student: 1,
+        created_at: "2020-08-06T15:42:57.000Z",
+        updated_at: "2020-08-06T15:43:00.000Z",
         created_by: null,
         updated_by: null
     }
