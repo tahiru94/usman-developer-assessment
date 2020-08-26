@@ -125,7 +125,7 @@ const student1 = {
 }
 
 const student2 = {
-    id: 1,
+    id: 2,
     name: "Jane Smith",
     email: "jane.smith@gemail.com",
     school_id: "1234567890",
