@@ -59,7 +59,7 @@ class StudentController {
                 return openAssessmentIds.includes(assessment.id);
             });
 
-            ctx.body = openAssessments;
+            ctx.body = openAssessments.length ? openAssessments : `No open assessments exist for student ${studentId}.`;
         }
     }
 
