@@ -4,23 +4,21 @@ import * as Router from 'koa-router';
 import * as moment from 'moment';
 import { studentRepo } from '../repos/student.repo';
 import { logRepo } from '../repos/assessmentLog.repo';
+import { getStudentId } from '../utils';
 
 class StudentController {
     // constructor(){}
 
     async display(ctx: koa.Context, next: koa.Next) {
-        // Work starts here.
-        const idFromUrl: any = ctx.url.match(/\d+/);
-        const studentId: number = parseInt(idFromUrl[0]);
+        const studentId = getStudentId(ctx.url);
         const selectedStudent = await studentRepo.getLogsByStudent(studentId);
+
         ctx.body = selectedStudent;
     }
 
     async displayUpcomingAssessments(ctx: koa.Context, next: koa.Next) {
-        const idFromUrl: any = ctx.url.match(/\d+/);
-        const studentId: number = parseInt(idFromUrl[0]);
+        const studentId = getStudentId(ctx.url);
         const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
-
         const studentAssessments: any[] = selectedStudent.assessments;
 
         // Retrieve upcoming assessments
@@ -35,13 +33,10 @@ class StudentController {
     }
 
     async displayOpenAssessments(ctx: koa.Context, next: koa.Next) {
-        const idFromUrl: any = ctx.url.match(/\d+/);
-        const studentId: number = parseInt(idFromUrl[0]);
+        const studentId = getStudentId(ctx.url);
         const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
         const selectedLogs: any = await logRepo.getLogsByStudent(studentId);
-
         const studentAssessments: any[] = selectedStudent.assessments;
-
         const currentDate = new Date().toISOString();
 
         // First, find IDs for open assessment(s)
