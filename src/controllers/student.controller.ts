@@ -3,6 +3,7 @@ import * as koa from 'koa';
 import * as Router from 'koa-router';
 import * as moment from 'moment';
 import { studentRepo } from '../repos/student.repo';
+import { logRepo } from '../repos/assessmentLog.repo';
 
 class StudentController {
     // constructor(){}
@@ -37,16 +38,22 @@ class StudentController {
         const idFromUrl: any = ctx.url.match(/\d+/);
         const studentId: number = parseInt(idFromUrl[0]);
         const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
+        const selectedLogs: any = await logRepo.getLogsByStudent(studentId);
+
+        console.log(selectedLogs);
 
         const studentAssessments: any[] = selectedStudent.assessments;
 
-        // Retrieve open assessments
         const currentDate = new Date().toISOString();
-        const openAssessments: any[] = studentAssessments.filter(assessment => {
-            // Make sure assessment is open (between open_time and close_time)
-            return moment(currentDate).isAfter(assessment.open_time) && moment(currentDate).isBefore(assessment.close_time);
-        }).sort((first, second) => {
-            return moment(first.open_time).diff(second.open_time);
+
+        // First, find IDs for open assessment(s)
+        const openAssessmentIds: any[] = selectedLogs.filter((log: any) => {
+            return log.start_time === moment(currentDate);
+        }).map((assessment: any) => assessment.id);
+
+        // Next, get the assessments based on log IDs
+        const openAssessments = studentAssessments.filter(assessment => {
+            return openAssessmentIds.includes(assessment.id);
         });
 
         ctx.body = openAssessments;
