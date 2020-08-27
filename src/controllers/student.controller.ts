@@ -129,6 +129,29 @@ class StudentController {
         }
     }
 
+    async displayCompletedAssessments(ctx: koa.Context, next: koa.Next) {
+        const studentId = getStudentId(ctx.url);
+        const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
+
+        if (selectedStudent.error) {
+            ctx.body = getInvalidStudentIdMessage(studentId);
+        } else {
+            const selectedLogs: any = await logRepo.getLogsByStudent(studentId);
+            const completedAssessmentIds = selectedLogs.filter((log: any) => log.is_complete).map((log: any) => log.assessment);
+            const studentAssessments: any[] = selectedStudent.assessments;
+
+            const completedAssessments = studentAssessments.filter(assessment => {
+                return completedAssessmentIds.includes(assessment.id);
+            }).sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
+            });
+
+            ctx.body = completedAssessments.length ?
+                completedAssessments :
+                `No completed assessments exist for ${selectedStudent.name}`;
+        }
+    }
+
 }
 export const studentController = new StudentController();
 
@@ -143,5 +166,6 @@ router.get('/student/assessment/upcoming/:studentId', studentController.displayU
 router.get('/student/assessment/open/:studentId', studentController.displayOpenAssessments);
 router.get('/student/assessment/expired/:studentId', studentController.displayExpiredAssessments);
 router.get('/student/assessment/inprogress/:studentId', studentController.displayInProgressAssessments);
+router.get('/student/assessment/completed/:studentId', studentController.displayCompletedAssessments);
 
 export const StudentRouters = router;
