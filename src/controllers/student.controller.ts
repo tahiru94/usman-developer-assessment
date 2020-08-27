@@ -105,8 +105,9 @@ class StudentController {
             inProgressLogs.forEach((log: any) => {
                 studentAssessments.forEach((assessment: any) => {
                     if (log.assessment === assessment.id) {
-                        const timeElapsed: boolean = (moment(log.start_time).add(assessment.time_limit, 'minutes')).isAfter(moment(currentDate));
-                        if (moment(currentDate).isBefore(moment(assessment.close_time)) && !timeElapsed) {
+                        const hasNotExpired: boolean = moment(currentDate).isBefore(moment(assessment.close_time));
+                        const timeElapsed: boolean = (moment(log.start_time).add(parseInt(assessment.time_limit), 'minutes')).isBefore(moment(currentDate))
+                        if (hasNotExpired && !timeElapsed) {
                             inProgressAssessments.push(assessment);
                         }
                     }
