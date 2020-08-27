@@ -6,7 +6,7 @@ const log1 = [
     {
         id: 7,
         is_complete: true,
-        start_time: "2020-07-24T16:36:37.000Z",
+        start_time: "2020-09-24T16:36:37.000Z",
         total_time: "183297",
         total_correct: 5,
         build_seed: null,
@@ -21,7 +21,7 @@ const log1 = [
     {
         id: 8,
         is_complete: true,
-        start_time: "2020-07-24T16:49:59.000Z",
+        start_time: "2020-09-24T16:49:59.000Z",
         total_time: "267049636",
         total_correct: 2,
         build_seed: null,
@@ -36,7 +36,7 @@ const log1 = [
     {
         id: 12,
         is_complete: true,
-        start_time: "2020-07-27T20:41:55.000Z",
+        start_time: "2020-09-27T20:41:55.000Z",
         total_time: "6435786",
         total_correct: 5,
         build_seed: null,
@@ -70,7 +70,7 @@ const log2 = [
     {
         id: 7,
         is_complete: true,
-        start_time: "2020-07-24T16:36:37.000Z",
+        start_time: "2020-09-24T16:36:37.000Z",
         total_time: "183297",
         total_correct: 5,
         build_seed: null,

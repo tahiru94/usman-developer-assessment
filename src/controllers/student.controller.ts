@@ -4,8 +4,11 @@ import * as Router from 'koa-router';
 import * as moment from 'moment';
 import { studentRepo } from '../repos/student.repo';
 import { logRepo } from '../repos/assessmentLog.repo';
-import { getStudentId, getInvalidStudentIdMessage } from '../utils';
-import { format } from 'path';
+import {
+    getStudentId,
+    getInvalidStudentIdMessage,
+    getEmptyAssessmentResponseMessage
+} from '../utils';
 
 class StudentController {
     // constructor(){}
@@ -36,7 +39,7 @@ class StudentController {
 
             ctx.body = upcomingAssessments.length ?
                 upcomingAssessments :
-                `No upcoming assessments exist for ${selectedStudent.name}.`;
+                getEmptyAssessmentResponseMessage('upcoming', selectedStudent.name);
         }
     }
 
@@ -66,7 +69,7 @@ class StudentController {
 
             ctx.body = openAssessments.length ?
                 openAssessments :
-                `No open assessments exist for ${selectedStudent.name}.`;
+                getEmptyAssessmentResponseMessage('open', selectedStudent.name);
         }
     }
 
@@ -90,7 +93,7 @@ class StudentController {
 
             ctx.body = expiredAssessments.length ?
                 expiredAssessments :
-                `No expired assessments exist for ${selectedStudent.name}`;
+                getEmptyAssessmentResponseMessage('expired', selectedStudent.name);
         }
     }
 
@@ -125,7 +128,30 @@ class StudentController {
 
             ctx.body = inProgressAssessments.length ?
                 inProgressAssessments :
-                `No in progress assessments exist for ${selectedStudent.name}`;
+                getEmptyAssessmentResponseMessage('in progress', selectedStudent.name);
+        }
+    }
+
+    async displayCompletedAssessments(ctx: koa.Context, next: koa.Next) {
+        const studentId = getStudentId(ctx.url);
+        const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
+
+        if (selectedStudent.error) {
+            ctx.body = getInvalidStudentIdMessage(studentId);
+        } else {
+            const selectedLogs: any = await logRepo.getLogsByStudent(studentId);
+            const completedAssessmentIds = selectedLogs.filter((log: any) => log.is_complete).map((log: any) => log.assessment);
+            const studentAssessments: any[] = selectedStudent.assessments;
+
+            const completedAssessments = studentAssessments.filter(assessment => {
+                return completedAssessmentIds.includes(assessment.id);
+            }).sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
+            });
+
+            ctx.body = completedAssessments.length ?
+                completedAssessments :
+                getEmptyAssessmentResponseMessage('completed', selectedStudent.name);
         }
     }
 
@@ -143,5 +169,6 @@ router.get('/student/assessment/upcoming/:studentId', studentController.displayU
 router.get('/student/assessment/open/:studentId', studentController.displayOpenAssessments);
 router.get('/student/assessment/expired/:studentId', studentController.displayExpiredAssessments);
 router.get('/student/assessment/inprogress/:studentId', studentController.displayInProgressAssessments);
+router.get('/student/assessment/completed/:studentId', studentController.displayCompletedAssessments);
 
 export const StudentRouters = router;
