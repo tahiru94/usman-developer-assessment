@@ -4,8 +4,11 @@ import * as Router from 'koa-router';
 import * as moment from 'moment';
 import { studentRepo } from '../repos/student.repo';
 import { logRepo } from '../repos/assessmentLog.repo';
-import { getStudentId, getInvalidStudentIdMessage } from '../utils';
-import { format } from 'path';
+import {
+    getStudentId,
+    getInvalidStudentIdMessage,
+    getEmptyAssessmentResponseMessage
+} from '../utils';
 
 class StudentController {
     // constructor(){}
@@ -36,7 +39,7 @@ class StudentController {
 
             ctx.body = upcomingAssessments.length ?
                 upcomingAssessments :
-                `No upcoming assessments exist for ${selectedStudent.name}.`;
+                getEmptyAssessmentResponseMessage('upcoming', selectedStudent.name);
         }
     }
 
@@ -66,7 +69,7 @@ class StudentController {
 
             ctx.body = openAssessments.length ?
                 openAssessments :
-                `No open assessments exist for ${selectedStudent.name}.`;
+                getEmptyAssessmentResponseMessage('open', selectedStudent.name);
         }
     }
 
@@ -90,7 +93,7 @@ class StudentController {
 
             ctx.body = expiredAssessments.length ?
                 expiredAssessments :
-                `No expired assessments exist for ${selectedStudent.name}`;
+                getEmptyAssessmentResponseMessage('expired', selectedStudent.name);
         }
     }
 
@@ -125,7 +128,7 @@ class StudentController {
 
             ctx.body = inProgressAssessments.length ?
                 inProgressAssessments :
-                `No in progress assessments exist for ${selectedStudent.name}`;
+                getEmptyAssessmentResponseMessage('in progress', selectedStudent.name);
         }
     }
 
@@ -148,7 +151,7 @@ class StudentController {
 
             ctx.body = completedAssessments.length ?
                 completedAssessments :
-                `No completed assessments exist for ${selectedStudent.name}`;
+                getEmptyAssessmentResponseMessage('completed', selectedStudent.name);
         }
     }
 

@@ -10,3 +10,7 @@ export const getStudentId = (url: string): number => {
 export const getInvalidStudentIdMessage = (id: number): string => {
     return `No student was found for ID ${id}. Please try again.`;
 }
+
+export const getEmptyAssessmentResponseMessage = (status: string, name: string) => {
+    return `No ${status} assessments exist for ${name}`;
+}
