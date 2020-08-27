@@ -120,6 +120,23 @@ const student1 = {
             updated_at: "2020-07-21T04:19:44.000Z",
             created_by: null,
             updated_by: null
+        },
+        {
+            id: 7,
+            name: "Exam-AF",
+            description: "NCE-2020:Exam-AE",
+            open_time: "2020-06-07T00:00:00.000Z",
+            close_time: "2029-06-05T00:00:00.000Z",
+            time_limit: "100",
+            version_number: 0,
+            version_name: null,
+            parent_assessment: null,
+            type: null,
+            is_locked: false,
+            created_at: "2020-07-21T04:19:44.000Z",
+            updated_at: "2020-07-21T04:19:44.000Z",
+            created_by: null,
+            updated_by: null
         }
     ]
 }

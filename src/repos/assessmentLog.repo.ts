@@ -1,5 +1,6 @@
 // Feel free to change values or add more examples as needed (You cannot change the model)
 // Assume this is essentially a call to the database
+import * as moment from 'moment';
 
 const log1 = [
     {
@@ -50,7 +51,7 @@ const log1 = [
     {
         id: 15,
         is_complete: false,
-        start_time: new Date().toISOString(), // Mark this with todays data and time for an examle of an open exam
+        start_time: moment(new Date().toISOString()).subtract(50, 'minutes'), // Mark this with todays data and time for an examle of an open exam
         total_time: null,
         total_correct: null,
         build_seed: null,

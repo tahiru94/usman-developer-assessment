@@ -51,14 +51,17 @@ class StudentController {
             const studentAssessments: any[] = selectedStudent.assessments;
             const currentDate = new Date().toISOString();
 
-            // First, find IDs for open assessment(s)
-            const openAssessmentIds: any[] = selectedLogs.filter((log: any) => {
-                return moment(log.start_time).isSame(moment(currentDate), 'day');
-            }).map((assessment: any) => assessment.assessment); // assessment ID
+            // First, get all assessment log IDs
+            const assessmentLogIds = selectedLogs.map((log: any) => {
+                return log.assessment
+            });
 
-            // Next, get the assessments based on log IDs
             const openAssessments = studentAssessments.filter(assessment => {
-                return openAssessmentIds.includes(assessment.id);
+                const isOpen: boolean = moment(assessment.open_time).isBefore(moment(currentDate)) &&
+                    moment(assessment.close_time).isAfter(moment(currentDate));
+                return isOpen && !assessmentLogIds.includes(assessment.id);
+            }).sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
             });
 
             ctx.body = openAssessments.length ?
@@ -81,11 +84,48 @@ class StudentController {
             // (no logs exist for these assessments, since they were never attempted)
             const expiredAssessments = studentAssessments.filter(assessment => {
                 return moment(assessment.close_time).isBefore(moment(currentDate));
-            });
+            }).sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
+            });;
 
             ctx.body = expiredAssessments.length ?
                 expiredAssessments :
                 `No expired assessments exist for ${selectedStudent.name}`;
+        }
+    }
+
+    async displayInProgressAssessments(ctx: koa.Context, next: koa.Next) {
+        const studentId = getStudentId(ctx.url);
+        const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
+
+        if (selectedStudent.error) {
+            ctx.body = getInvalidStudentIdMessage(studentId);
+        } else {
+            const currentDate = new Date().toISOString();
+            const selectedLogs: any = await logRepo.getLogsByStudent(studentId);
+            const studentAssessments: any[] = selectedStudent.assessments;
+            const inProgressLogs = selectedLogs.filter((log: any) => log.is_complete === false);
+            const inProgressAssessments: any[] = [];
+
+            inProgressLogs.forEach((log: any) => {
+                studentAssessments.forEach((assessment: any) => {
+                    if (log.assessment === assessment.id) {
+                        const hasNotExpired: boolean = moment(currentDate).isBefore(moment(assessment.close_time));
+                        const timeElapsed: boolean = (moment(log.start_time).add(parseInt(assessment.time_limit), 'minutes')).isBefore(moment(currentDate))
+                        if (hasNotExpired && !timeElapsed) {
+                            inProgressAssessments.push(assessment);
+                        }
+                    }
+                });
+            });
+
+            inProgressAssessments.sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
+            });
+
+            ctx.body = inProgressAssessments.length ?
+                inProgressAssessments :
+                `No in progress assessments exist for ${selectedStudent.name}`;
         }
     }
 
@@ -102,5 +142,6 @@ router.get('/student/display/:studentid', studentController.display)
 router.get('/student/assessment/upcoming/:studentId', studentController.displayUpcomingAssessments)
 router.get('/student/assessment/open/:studentId', studentController.displayOpenAssessments);
 router.get('/student/assessment/expired/:studentId', studentController.displayExpiredAssessments);
+router.get('/student/assessment/inprogress/:studentId', studentController.displayInProgressAssessments);
 
 export const StudentRouters = router;
