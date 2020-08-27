@@ -5,6 +5,7 @@ import * as moment from 'moment';
 import { studentRepo } from '../repos/student.repo';
 import { logRepo } from '../repos/assessmentLog.repo';
 import { getStudentId, getInvalidStudentIdMessage } from '../utils';
+import { format } from 'path';
 
 class StudentController {
     // constructor(){}
@@ -20,7 +21,6 @@ class StudentController {
         const studentId = getStudentId(ctx.url);
         const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
 
-
         if (selectedStudent.error) {
             ctx.body = getInvalidStudentIdMessage(studentId);
         } else {
@@ -34,7 +34,9 @@ class StudentController {
                 return moment(first.open_time).diff(second.open_time);
             });
 
-            ctx.body = upcomingAssessments;
+            ctx.body = upcomingAssessments.length ?
+                upcomingAssessments :
+                `No upcoming assessments exist for ${selectedStudent.name}.`;
         }
     }
 
@@ -59,7 +61,31 @@ class StudentController {
                 return openAssessmentIds.includes(assessment.id);
             });
 
-            ctx.body = openAssessments.length ? openAssessments : `No open assessments exist for student ${studentId}.`;
+            ctx.body = openAssessments.length ?
+                openAssessments :
+                `No open assessments exist for ${selectedStudent.name}.`;
+        }
+    }
+
+    async displayExpiredAssessments(ctx: koa.Context, next: koa.Next) {
+        const studentId = getStudentId(ctx.url);
+        const selectedStudent: any = await studentRepo.getLogsByStudent(studentId);
+
+        if (selectedStudent.error) {
+            ctx.body = getInvalidStudentIdMessage(studentId);
+        } else {
+            const studentAssessments: any[] = selectedStudent.assessments;
+            const currentDate = new Date().toISOString();
+
+            // Get all expired assignments
+            // (no logs exist for these assessments, since they were never attempted)
+            const expiredAssessments = studentAssessments.filter(assessment => {
+                return moment(assessment.close_time).isBefore(moment(currentDate));
+            });
+
+            ctx.body = expiredAssessments.length ?
+                expiredAssessments :
+                `No expired assessments exist for ${selectedStudent.name}`;
         }
     }
 
@@ -75,5 +101,6 @@ const router = new Router()
 router.get('/student/display/:studentid', studentController.display)
 router.get('/student/assessment/upcoming/:studentId', studentController.displayUpcomingAssessments)
 router.get('/student/assessment/open/:studentId', studentController.displayOpenAssessments);
+router.get('/student/assessment/expired/:studentId', studentController.displayExpiredAssessments);
 
 export const StudentRouters = router;
