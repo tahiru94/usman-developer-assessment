@@ -51,14 +51,17 @@ class StudentController {
             const studentAssessments: any[] = selectedStudent.assessments;
             const currentDate = new Date().toISOString();
 
-            // First, find IDs for open assessment(s)
-            const openAssessmentIds: any[] = selectedLogs.filter((log: any) => {
-                return moment(log.start_time).isSame(moment(currentDate), 'day');
-            }).map((assessment: any) => assessment.assessment); // assessment ID
+            // First, get all assessment log IDs
+            const assessmentLogIds = selectedLogs.map((log: any) => {
+                return log.assessment
+            });
 
-            // Next, get the assessments based on log IDs
             const openAssessments = studentAssessments.filter(assessment => {
-                return openAssessmentIds.includes(assessment.id);
+                const isOpen: boolean = moment(assessment.open_time).isBefore(moment(currentDate)) &&
+                    moment(assessment.close_time).isAfter(moment(currentDate));
+                return isOpen && !assessmentLogIds.includes(assessment.id);
+            }).sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
             });
 
             ctx.body = openAssessments.length ?
@@ -81,7 +84,9 @@ class StudentController {
             // (no logs exist for these assessments, since they were never attempted)
             const expiredAssessments = studentAssessments.filter(assessment => {
                 return moment(assessment.close_time).isBefore(moment(currentDate));
-            });
+            }).sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
+            });;
 
             ctx.body = expiredAssessments.length ?
                 expiredAssessments :
@@ -112,6 +117,10 @@ class StudentController {
                         }
                     }
                 });
+            });
+
+            inProgressAssessments.sort((first, second) => {
+                return moment(first.open_time).diff(moment(second.open_time));
             });
 
             ctx.body = inProgressAssessments.length ?
